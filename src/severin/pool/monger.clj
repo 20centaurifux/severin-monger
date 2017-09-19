@@ -5,9 +5,11 @@
               [core :as mg]
               [credentials :as mcred])))
 
+;; A created resource holds a database connection (com.mongodb.MongoClient), a database instance (com.mongodb.DB) and the URI.
 (defrecord MongerConn [conn db uri])
 
 (defn- parse-uri
+  "Parses a URI string into a map of keywords to URI parts."
   [uri]
   (let [uri' (java.net.URI. uri)]
     {:host (.getHost uri')
@@ -23,11 +25,13 @@
                     (zipmap [:username :password] (clojure.string/split info #":" 2)))}))
 
 (defn- create-credentials
+  "Create a MongoCredential instance from a map."
   [m]
   (when-let [cred (:credentials m)]
     (let [[username password] (map cred [:username :password])]
       (mcred/create username (:db-name m) password))))
 
+;; Create and dispose MongoDB connections.
 (defrecord MongerFactory
   []
 
