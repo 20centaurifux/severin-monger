@@ -1,4 +1,4 @@
-(defproject zcfux/severin-monger "0.1.0-SNAPSHOT"
+(defproject zcfux/severin-monger "0.1.0"
   :description "Monger connection pooling."
   :url "https://github.com/20centaurifux/severin-monger"
   :license {:name "GPL3"
