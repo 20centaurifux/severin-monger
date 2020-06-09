@@ -2,8 +2,8 @@
   "MongoDB connection pooling."
   (:require [severin.core :as severin]
             (monger
-              [core :as mg]
-              [credentials :as mcred])))
+             [core :as mg]
+             [credentials :as mcred])))
 
 ;; A created resource holds a database connection (com.mongodb.MongoClient), a database instance (com.mongodb.DB) and the URI.
 (defrecord MongerConn [conn db uri])
@@ -33,7 +33,7 @@
 
 ;; Create and dispose MongoDB connections.
 (defrecord MongerFactory
-  []
+           []
 
   severin/FactoryProtocol
 
@@ -46,13 +46,13 @@
           db (mg/get-db conn (:db-name uri'))]
       (MongerConn. conn db uri)))
 
- (-dispose!
+  (-dispose!
     [this resource]
     (mg/disconnect (:conn resource)))
 
   (-recycle!
     [this resource uri]
-    (when-let [uri'(parse-uri uri)]
+    (when-let [uri' (parse-uri uri)]
       (assoc resource :db (mg/get-db (:conn resource) (:db-name uri')))))
 
   (-valid?
@@ -75,8 +75,8 @@
                     (:host uri')
                     (:port uri')
                     (:db-name uri')))
-      keyword))))
+          keyword))))
 
-(defmethod severin/factory "monger"
+(defmethod severin/->factory "monger"
   [uri]
   (MongerFactory.))
