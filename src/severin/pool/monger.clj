@@ -5,7 +5,8 @@
              [core :as mg]
              [credentials :as mcred])))
 
-;; A created resource holds a database connection (com.mongodb.MongoClient), a database instance (com.mongodb.DB) and the URI.
+; A created resource holds a database connection (com.mongodb.MongoClient), a
+; database instance (com.mongodb.DB) and the URI.
 (defrecord MongerConn [conn db uri])
 
 (defn- parse-uri
@@ -22,7 +23,8 @@
                   (subs path 1)
                   "test"))
      :credentials (when-let [info (.getUserInfo uri')]
-                    (zipmap [:username :password] (clojure.string/split info #":" 2)))}))
+                    (zipmap [:username :password]
+                            (clojure.string/split info #":" 2)))}))
 
 (defn- create-credentials
   "Create a MongoCredential instance from a map."
@@ -31,17 +33,16 @@
     (let [[username password] (map cred [:username :password])]
       (mcred/create username (:db-name m) password))))
 
-;; Create and dispose MongoDB connections.
-(defrecord MongerFactory
-           []
-
+(defrecord MongerFactory []
   severin/FactoryProtocol
-
   (-create!
     [this uri]
     (let [uri' (parse-uri uri)
           conn (if-let [cred (:credentials uri')]
-                 (mg/connect-with-credentials (:host uri') (:port uri') (create-credentials uri'))
+                 (mg/connect-with-credentials
+                  (:host uri')
+                  (:port uri')
+                  (create-credentials uri'))
                  (mg/connect uri'))
           db (mg/get-db conn (:db-name uri'))]
       (MongerConn. conn db uri)))
@@ -60,7 +61,6 @@
     true)
 
   severin/URI->KeyProtocol
-
   (-uri->key
     [this uri]
     (let [uri' (parse-uri uri)]
@@ -77,6 +77,6 @@
                     (:db-name uri')))
           keyword))))
 
-(defmethod severin/->factory "monger"
+(defmethod severin/make-factory "monger"
   [uri]
   (MongerFactory.))
